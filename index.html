@@ -1,11 +1,76 @@
 ﻿<!DOCTYPE html>
 
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
-<head>
-    <meta charset="utf-8" />
-    <title></title>
+<html>
+<head runat="server">  
+<script type="text/javascript" src="jquery-1.10.2.js"></script>  
+  <title>My Page</title>
+<script>
+$(document).ready(function() {
+  
+$("#lnkGetStatus").click(function(){
+$.support.cors = true;
+	var tnum=$("#trainNo").val();		
+	var DateOfJourney=$("#DateOfJourney").val();
+	alert(tnum);
+	alert(DateOfJourney);
+	var apiKey="rv0g0609394";
+
+	var location = "http://api.railwayapi.com/live/train/"+tnum+"/doj/"+DateOfJourney+"/apikey/"+apiKey;	
+	alert(location);
+		$("#dvResults").html(location);		
+	$.ajax({
+		type: "POST",
+                contentType: "application/json:charset=utf-8",
+                processData: true,
+		url:location,                
+		success : function(data) {
+	//debugger;
+		var HtmlCode="<span>"+JSON.parse(data).position+"</span>";
+		HtmlCode+="<table><tr><td>S.No.</td><td>Station Name</td><td>Scheduled Arrival</td><td>Actual Arrival</td><td>Scheduled Dept.</td><td>Actual Dept</td><td>Status</td></tr>";
+		for(var i=0;i<JSON.parse(data).route.length;i++){
+		HtmlCode+="<tr>";
+		HtmlCode+="<td>"+JSON.parse(data).route[i].no+"</td>";
+		HtmlCode+="<td>"+JSON.parse(data).route[i].station+"</td>";
+		HtmlCode+="<td>"+JSON.parse(data).route[i].scharr+"</td>";
+		HtmlCode+="<td>"+JSON.parse(data).route[i].schdep+"</td>";
+		HtmlCode+="<td>"+JSON.parse(data).route[i].actarr+"</td>";
+		HtmlCode+="<td>"+JSON.parse(data).route[i].actdep+"</td>";
+		HtmlCode+="<td>"+JSON.parse(data).route[i].status+"</td>";		
+		HtmlCode+="</tr>";					
+		}			
+		HtmlCode+="</table>";
+		$("#dvResults").html(HtmlCode);
+		},
+		error: function (jqXHR, textStatus, errorThrown) {    
+                  alert(errorThrown);
+                        alert(textStatus);
+                        alert(jqXHR.responseText);  
+                            },
+	beforeSend:function(){
+		alert("Request Started");
+	},
+	complete:function(){
+
+		alert("Request Complete");
+		}
+		
+		});
+	});
+
+});
+</script>
+
 </head>
 <body>
- Hello Buddy,   Welcome To My New Phone App
+<input type="text" id="trainNo" />
+<input type="text" id="DateOfJourney" />
+
+
+	<a href="javascript:void(0);" id="lnkGetStatus">
+	click Here
+	</a>
+
+<div id="dvResults">
+</div>
 </body>
 </html>
